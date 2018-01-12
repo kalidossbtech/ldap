@@ -1,0 +1,58 @@
+yum install krb5-server.x86_64 krb5-server-ldap.x86_64 pam_krb5.x86_64 sssd-krb5.x86_64 sssd-krb5-common.x86_64 krb5-workstation.x86_64
+
+
+
+
+
+vim /etc/krb5.conf  && vim /var/kerberos/krb5  && vim /var/kerberos/krb5kdc/kdc.conf
+
+rename all names
+
+:%s/example.com/jvselectronics.lc
+:%s/EXAMPLE.COM/JVSELECTRONICS.LC
+
+
+kdb5_util create -s -r JVSELECTRONICS.LC
+
+type the password
+
+systemctl enable kadmin krb5kdc && systemctl start kadmin krb5kdc
+
+check the status by :
+
+systemctl status kadmin krb5kdc
+
+
+firewall-cmd --add-service=kerberos --permanent
+firewall-cmd --add-service=kerberos 
+
+
+kadmin.local
+
+addprinc root/admin
+addprinc -randkey host/testing.jvselectronics.lc
+ktadd -k /etc/testing.keytab host/testing.jvselectronics.lc
+
+
+#share this key to client
+scp   -rv /etc/mailserver.keytab /etc/krb5.conf root@192.168.1.154:/data/krb/ 
+
+
+
+In client machine 
+yum install pam_krb5 krb5-workstation
+In kali --> apt install krb5-kdc krb5-kdc-ldap
+
+
+ cp -rv /data/krb/krb5.conf /etc/krb5.conf
+
+ktutil
+#add keyfile to keytab loc ( rtk - ReadKey Tab )
+rkt /data/krb/mailserver.keytab 
+
+ wkt /etc/krb5.keytab (Write)
+
+ # to check entry 
+ list
+
+ 
